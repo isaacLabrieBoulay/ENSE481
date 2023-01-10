@@ -1,0 +1,21 @@
+1. What do you hope to gain from this class?
+2. What environments have you experience developing in: eg. Unix, Mac,
+Windows. What targets have you worked with: eg. ARM, Microchip,
+Intel, Freescale? What languages? Briefly describe the experience and
+the tools used.
+3. Describe the largest software system that you have personally built. Any
+software/hardware
+
+Answers
+1. I have not done embedded development in a while and I hope to refresh on those competences. The experience I have in this kind of work often involved
+   using libraries built by other developpers and I hoped that I could get experience building an application on a target absolutely from scratch. Also, I am
+   currently in a DSP class which has no project and I would like to be able to port the knowledge from that class into this project. Coming from a musical
+   background, I have a lot of interest in sound processing software. There's a super cool company called Neural DSP which I would love to work for.
+   
+2. I've developped on Unix and Windows systems using Keil uVision, Vim, and Cod::Blocks. I've used a lot of git and I still completely suck at it...
+   I've developped for the Cortex M3, CAEN nuclear instrumentation modules, the Texas Instrument MSP430FR5994IPNR, and a tiny bit of Arduino. I programmed in
+   C/C++/Python/VHDL. Most of my recent programming has been in the space of data science (machine learning using TensorFlow).
+
+3. I spent 8 months working at the Canadian Nuclear Laboratories on a Data Acquisition System for a Neutron Interrogation System. I used the MIDAS framework
+   to implement a system for controlling pulse discriminating modules, ADCs, and TDCs, using an FPGA I built a pretty basic logic system for the devices, I interacted
+   with an event packager, I built an event analyzer, and even (using templates) created a web interface for this system.
