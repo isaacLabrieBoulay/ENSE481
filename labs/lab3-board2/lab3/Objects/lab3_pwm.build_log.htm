@@ -1,0 +1,125 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.38.0.0
+Copyright (C) 2022 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Isaac Labrie-Boulay, University of Regina, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.38.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.38.0.0
+Dialog DLL:      DCM.DLL V1.17.5.0
+Target DLL:      UL2CM3.DLL V1.164.8.0
+Dialog DLL:      TCM.DLL V1.56.4.0
+ 
+<h2>Project:</h2>
+C:\Users\boubo\OneDrive\Documents\Engineering\ENSE 481\lab3-board2\lab3\lab3_pwm.uvprojx
+Project File Date:  03/01/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin'
+Rebuild target 'Target 1'
+compiling app.c...
+compiling CLI.c...
+.\drivers\pwm.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+cli\CLI.c(66): warning:  #186-D: pointless comparison of unsigned integer with zero
+  				else if (angle < 0)
+cli\CLI.c(117): warning:  #223-D: function "sprintf" declared implicitly
+  	sprintf(str_nums, "%f", double_time);
+cli\CLI.c(120): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "uint8_t *"
+  	send_message(str_nums, sizeof(str_nums));	
+cli\CLI.c: 4 warnings, 0 errors
+compiling main.c...
+.\drivers\pwm.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+app\main.c: 1 warning, 0 errors
+compiling timer_impl.c...
+compiling drivers.c...
+compiling time_opps.c...
+app\time_opps.c(217): warning:  #550-D: variable "s2"  was set but never used
+  	struct s8 s2;
+app\time_opps.c(242): warning:  #550-D: variable "s2"  was set but never used
+  	struct s128 s2;
+app\time_opps.c(272): warning:  #550-D: variable "s2"  was set but never used
+  	struct s1024 s2;
+app\time_opps.c(289): warning:  #1-D: last line of file ends without a newline
+  }
+app\time_opps.c: 4 warnings, 0 errors
+compiling time_trig_ops.c...
+app\time_trig_ops.c(67): warning:  #550-D: variable "s"  was set but never used
+  	float s;
+app\time_trig_ops.c(135): warning:  #550-D: variable "c"  was set but never used
+  	float c;
+app\time_trig_ops.c: 2 warnings, 0 errors
+assembling startup_stm32f10x_md.s...
+compiling pwm.c...
+drivers\pwm.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+drivers\pwm.c(43): warning:  #1-D: last line of file ends without a newline
+  } 
+drivers\pwm.c: 2 warnings, 0 errors
+compiling DMA_STM32F10x.c...
+compiling system_stm32f10x.c...
+compiling GPIO_STM32F10x.c...
+linking...
+Program Size: Code=19516 RO-data=1140 RW-data=4 ZI-data=1636  
+".\Objects\lab3_pwm.axf" - 0 Error(s), 13 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.9.0.pack
+                ARM.CMSIS.5.9.0
+                CMSIS (Common Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.6.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F1xx_DFP.2.4.0.pack
+                Keil.STM32F1xx_DFP.2.4.0
+                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
+   * Component: DMA Version: 1.3
+   * Component: GPIO Version: 1.3
+   * Component: Startup Version: 1.0.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32NUCLEO_BSP.1.8.0.pack
+                Keil.STM32NUCLEO_BSP.1.8.0
+                STMicroelectronics Nucleo Boards Support and Examples
+
+<h2>Collection of Component include folders:</h2>
+  ./RTE/Device/STM32F103RB
+  ./RTE/_Target_1
+  C:/Users/boubo/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
+  C:/Users/boubo/AppData/Local/Arm/Packs/Keil/STM32F1xx_DFP/2.4.0/Device/Include
+  C:/Users/boubo/AppData/Local/Arm/Packs/Keil/STM32F1xx_DFP/2.4.0/RTE_Driver
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.6.0
+
+   * Component: Keil::Device:DMA:1.3
+      Include file:  RTE_Driver/DMA_STM32F10x.h
+      Source file:   RTE_Driver/DMA_STM32F10x.c
+
+   * Component: Keil::Device:GPIO:1.3
+      Source file:   RTE_Driver/GPIO_STM32F10x.c
+      Include file:  RTE_Driver/GPIO_STM32F10x.h
+
+   * Component: Keil::Device:Startup:1.0.0
+      Source file:   Device/Source/system_stm32f10x.c
+      Include file:  RTE_Driver/Config/RTE_Device.h
+      Source file:   Device/Source/ARM/STM32F1xx_OPT.s
+      Source file:   Device/Source/ARM/startup_stm32f10x_md.s
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
