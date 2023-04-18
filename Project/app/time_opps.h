@@ -1,14 +1,17 @@
 /**
 		Filename: time_opps.h
-		Description: This file declares all basic operation functions to time
+		Description: This file declares all basic operation functions for ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
-		Date: 2023-02-17
+		Date: 2023-04-17
 		Class: ense481
-		Project: lab2
+		Project: Ball Height Controller
 */
 #ifndef TIME_OPPS_H
 #define TIME_OPPS_H
+
 #include <stdint.h>
+#include "timer.h"
+#include "app.h"
 
 /** Generate Random Number
 

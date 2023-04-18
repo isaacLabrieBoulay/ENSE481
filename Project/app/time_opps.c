@@ -6,10 +6,8 @@
 		Class: ense481
 		Project: lab2
 */
-#include <stdint.h>
+
 #include "time_opps.h"
-#include "timer.h"
-#include "app.h"
 
 #define MAX (18446744073709551615ULL) // biggest 64 bit number
 

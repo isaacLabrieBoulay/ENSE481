@@ -1,41 +1,28 @@
 /**
-Filename: main.c
-10
-Description: Main Program for CLI utility
-Author: Isaac Labrie-Boulay (200391860)
-Date: 2023-02-07
-Class: ense481
-Project: lab1 (USART)
+		Filename: main.c
+		Description: Main Program for ENSE 481 Final Project
+		Author: Isaac Labrie-Boulay (200391860)
+		Date: 2023-04-17
+		Class: ense481
+		Project: Ball Height Controller
 */
+
+#include <stdint.h>
+#include <stdio.h>
+#include <math.h>
 #include "drivers.h"
 #include "CLI.h"
-#include <stdint.h>
 #include "app.h"
 #include "drivers.h"
 #include "timer.h"
 #include "pwm.h"
-#include <stdio.h>
-#include <math.h>
 #include "time_opps.h"
 #include "time_trig_ops.h"
-#define  M_PI  3.14159265358
-#define cos_30 sqrt(3)/2
-#define sin_30 1/2
-
-#define BUFFER_SIZE 40 // max amount of characters in tx/rx buffers
-
-/* Initialize Buffers */
-uint8_t rx_buffer_CLI[BUFFER_SIZE];
-uint8_t tx_buffer_CLI[BUFFER_SIZE];
-uint8_t cursor = 0; // cursor initially at 0
-
-// Initial voltage setpoint
-int16_t setpoint = 1700;
 
 // Timing parameters
-uint16_t last_time = 0;
-uint16_t curr_time = 0;
-_Bool dont_sleep = 1;
+uint16_t last_time = 0; // previous ADC read time
+uint16_t curr_time = 0; // current ADC read time
+_Bool dont_sleep = 1; 	// no sleep
 
 /* state machine states */
 typedef enum {
@@ -46,6 +33,7 @@ typedef enum {
 } state;
 
 float error, prev_error, control_signal = 0.0; // control errors and control_signal (effort)
+uint16_t sample;
 
 int main(){ 
 	
@@ -77,97 +65,54 @@ int main(){
 				
 				- It only sleeps waiting for curr_time-last_time == 80ms after updating the servo
 		**/
-		
-		curr_time = get_count(); // get timer count
-		
-		if ((curr_time - last_time == 800) || 
-				(10000 - last_time + curr_time) == 800 ||
-				dont_sleep){ 
-		
-				/** Switch statement handdling state machine transitions */
-				switch(current_state){
-					case BEGIN:
-						initial_boost(); 					// Initially, reset the ball position and give it a boost
+		if (control_flag)
+		{
+			curr_time = get_count(); // get timer count
+			
+			if ((curr_time - last_time == 800) || 
+					(10000 - last_time + curr_time) == 800 ||
+					dont_sleep){ 
+			
+					// Switch statement handdling state machine transitions
+					switch(current_state){
+						case BEGIN:
+							
+							current_state = READ_ADC; 			// switch states
+							dont_sleep = 1;									// don't sleep till next state
+							break;
 						
-						current_state = READ_ADC; // switch states
-						dont_sleep = 1;						// don't sleep till next state
-						break;
-					
-					case READ_ADC:
-						last_time = curr_time; 					// update previous reading time
-						uint16_t sample = get_height(); // read the height of the ball
-						prev_error = error;							// update the previous error value
-						error = setpoint - sample;			// calculate the current error based on setpoint
+						case READ_ADC:
+							last_time = curr_time; 					// update previous reading time
+							sample = get_height(); // read the height of the ball
+							prev_error = error;							// update the previous error value
+							error = setpoint - sample;			// calculate the current error based on setpoint
+							
+							current_state = CALCULATE_CONTROL_SIGNAL; // switch states
+							dont_sleep = 1;														// don't sleep till next state
+							break;
 						
-						current_state = CALCULATE_CONTROL_SIGNAL; // switch states
-						dont_sleep = 1;														// don't sleep till next state
-						break;
-					
-					case CALCULATE_CONTROL_SIGNAL:
+						case CALCULATE_CONTROL_SIGNAL:
+							
+							control_signal = calculate_PID(error, prev_error); // Calculate control signal
+							
+							current_state = UPDATE_SERVO_POSITION; // switch states
+							dont_sleep = 1;												 // don't sleep till next state
+							break;
 						
-						control_signal = calculate_PID(error, prev_error); // Calculate control signal
-						
-						current_state = UPDATE_SERVO_POSITION; // switch states
-						dont_sleep = 1;												 // don't sleep till next state
-						break;
-					
-					case UPDATE_SERVO_POSITION:
-						
-						update_servo_angle(control_signal); // Map control signal to PWM output			
-						
-						dont_sleep = 0; // Sleep till next sample
-						current_state = READ_ADC;
-						break;
+						case UPDATE_SERVO_POSITION:
+							
+							update_servo_angle(control_signal); // Map control signal to PWM output			
+							
+							dont_sleep = 0; // Sleep till next sample
+							current_state = READ_ADC;
+							break;
+					}
 				}
 			}
-			
-/*
-		if(rx_ready_USART()){ // Continuously polling for data in USART2 data register
-			
-			// get character. *Note: Both send_character() and delete_character() update the cursor position 
-			cursor = read_character(rx_buffer_CLI, cursor);
-
-			// Everytime a character is sent, we send it back for visual feedback 
-			tx_buffer_CLI[0] = rx_buffer_CLI[cursor-1];
-			tx_USART(tx_buffer_CLI);
-			
-			//verify command if an 'enter' is found
-			if(rx_buffer_CLI[cursor-1] == '\r'){
-				
-				
-				uint8_t action = parser_CLI(rx_buffer_CLI);
-				
-				cursor = carriage_return_CLI(rx_buffer_CLI,tx_buffer_CLI, BUFFER_SIZE, cursor);
-				
-				switch(action){
-					case 0: // help
-						help_CLI();
-						break;
-					case 1: // turn on LED
-						start_LED();
-						break;	
-					case 2: // turn off LED
-						stop_LED();	
-						break;
-					case 3: // query LED
-						break;
-					case 4: // date & time
-						date_and_time_CLI();
-						break;
-					case 5: // timer script
-						timer_CLI(); // print out times
-						break;
-					default:
-						help_CLI(); // defaults to the help command
-						break;
-					
-				}
-			}
-			// Handles DEL
-			if(rx_buffer_CLI[cursor-1] == 0x7F){
-				cursor = delete_character(rx_buffer_CLI, cursor);
-			}
-		
-		}*/
+		// Tend to command if "/r" is received
+		if (cmd_received_flag) {
+        cmd_received_flag = 0;
+        handle_CLI();
+    }
 	}
 }

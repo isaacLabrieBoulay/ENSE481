@@ -1,4 +1,12 @@
-#include <stm32f10x.h>
+/**
+		Filename: pwm.c
+		Description: This file defines PWM functions for ENSE 481 Final Project
+		Author: Isaac Labrie-Boulay (200391860)
+		Date: 2023-04-17
+		Class: ense481
+		Project: Ball Height Controller
+*/
+
 #include "pwm.h"
 
 void start_PWM (void) {
@@ -24,12 +32,12 @@ void start_PWM (void) {
     TIM4->CR1 |= 1u<<0;   // 0: enable timer
 }
 void write_angle_PWM(uint16_t angle) {
-		uint16_t dutyCycle = ((angle - MIN_ANGLE) * DUTY_CYCLE_RANGE / ANGLE_RANGE) + MIN_DUTY_CYCLE;
+		uint16_t dutyCycle = ((angle - MIN_ANGLE) * DUTY_CYCLE_RANGE / ANGLE_RANGE) + PWM_MIN;
 		TIM4->CCR2  = dutyCycle;     // Set duty cycle
 } 
 void write_dutycycle_PWM(uint16_t angle) {
-		if (angle > MAX_DUTY_CYCLE || angle < MIN_DUTY_CYCLE) // Out of DC range protection
-			TIM4->CCR2 = MIN_DUTY_CYCLE;
+		if (angle > PWM_MAX || angle < PWM_MIN) // Out of DC range protection
+			TIM4->CCR2 = PWM_MIN;
 		else
 			TIM4->CCR2 = angle;     // Set duty cycle
 } 

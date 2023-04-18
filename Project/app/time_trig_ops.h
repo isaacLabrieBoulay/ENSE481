@@ -1,16 +1,18 @@
 /**
 		Filename: time_trig_opps.h
-		Description: This file declares all trig timing functions
+		Description: This file declares all trig timing functions ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
-		Date: 2023-02-17
+		Date: 2023-04-17
 		Class: ense481
-		Project: lab2
+		Project: Ball Height Controller
 */
 
 #ifndef TIME_TRIG_OPPS_H
 #define TIME_TRIG_OPPS_H
+
 #include <stdint.h>
 #include <math.h>
+#include "app.h"
 
 /** time cos(x) operation from math.h library
 

@@ -1,16 +1,18 @@
 /**
 		Filename: drivers.c
-		Description: This file defines all driver functions for lab1
+		Description: This file defines all driver functions for ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
 		Date: 2023-01-29
 		Class: ense481
-		Project: lab1
+		Project: Ball Height Controller
 */
-#include "CLI.h"
-#include "app.h"
+
 #include "drivers.h"
-#include <stm32f10x.h>
-#include "app.h"
+
+uint8_t rx_buffer[BUFFER_SIZE];
+uint8_t tx_buffer[BUFFER_SIZE];
+uint8_t cursor = 0;
+volatile _Bool cmd_received_flag = 0;
 
 void open_clock(){
 	// configure clocks
@@ -111,6 +113,12 @@ void open_USART(){
 	USART2->CR1 = USART2->CR1 |
 								(1u<<2)   	|	 // bit 2, RE=1, USART receiver enabled
 								(1u<<3);		 	 // bit 3, TE=1, USART transmitter enable
+	
+	// Enable Interrupt on USART2
+	USART2->CR1 |= (1u << 5); // bit 5, RXNEIE=1, RXNE interrupt enabled
+	NVIC_SetPriorityGrouping(2);
+	NVIC_SetPriority(USART2_IRQn, 1010); // both preemption priority and subpriority set to 1.
+	NVIC_EnableIRQ(USART2_IRQn);
 }
 void reset_USART(){
 	
@@ -154,7 +162,30 @@ _Bool rx_ready_USART(void){
 	uint8_t val = (USART2->SR & 1u<<5);
 	return val;
 }
+void USART2_IRQHandler(void) {
+    if (rx_ready_USART()) {
+        uint8_t received_char;
+        rx_USART(&received_char); // get new character
 
+        if (cursor < BUFFER_SIZE - 1) {
+            rx_buffer[cursor++] = received_char;
+						tx_buffer[0] = rx_buffer[cursor-1]; 
+						tx_USART(tx_buffer); //resend character
+					
+            if (received_char == '\r') { // if enter was sent
+                cmd_received_flag = 1; // set flag for CLI handling
+            }
+						// Handles DEL
+						if(rx_buffer[cursor-1] == 0x7F){
+								rx_buffer[cursor-1] = 0x00;
+								rx_buffer[cursor-2] = 0x00;
+								cursor = cursor - 2;
+						}
+        } else {
+            cursor = 0; // Reset the buffer if it's full
+        }
+    }
+}
 void open_ADC(void){
 	
 	// GPIO config, Port C

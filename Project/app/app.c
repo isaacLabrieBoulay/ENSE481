@@ -1,35 +1,38 @@
 /**
 		Filename: app.c
-		Description: This file defines all application functions for lab1
+		Description: This file defines all application functions for ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
-		Date: 2023-01-29
+		Date: 2023-04-17
 		Class: ense481
-		Project: lab1
+		Project: Ball Height Controller
 */
 
-#include "drivers.h"
-#include "CLI.h"
-#include "pwm.h"
 #include "app.h"
-#include "timer.h"
-#include <stm32f10x.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-#define ANGLE_EQ    901 
-#define ANGLE_LOW   ANGLE_EQ*(1-0.18)
-#define ANGLE_HIGH  ANGLE_EQ*(1+0.18)
-#define PID_MIN     -1000
-#define PID_MAX     1000
-#define PWM_MIN     0x258
-#define PWM_MAX     0x5DC
-#define ANGLE_MIN   0x258
-#define ANGLE_MAX   0x5DC
+// Lookup table for ball height to ADC value mapping (experimentally determined)
+LUT height_lut[LOOKUP_TABLE_SIZE] = {
+    {5, 3500},
+    {10, 2667},
+    {15, 2630},
+    {20, 2233},
+    {25, 1800},
+		{30, 1315},
+    {35, 1140},
+    {40, 900},
+    {45, 850},
+    {50, 800}
+};
+
+// open/closed loop control flag (open=0)
+volatile _Bool control_flag = 0;
+
+// Initial height setpoint
+int16_t setpoint = 1700;
 
 // PID controller parameters
 float Kp = 0.01;// Proportional gain
 float Ki = 0.7; // Integral gain
-float Kd = 4.5; // Derivative gain
+float Kd = 0.7; // Derivative gain
 
 void delay(uint32_t wait_time){
 	uint32_t tick = 0;
@@ -54,39 +57,31 @@ void blink_LED(){
 		delay(1600000);
 	}
 }
-void clear_buffers(uint8_t rx_buf[], uint8_t tx_buf[], uint8_t buffer_size){
-	/* zero all indeces of Tx/Rx buffers */
+uint16_t parse_height() {
+	
+	// parse height string
+	char height_string[2];
+	uint16_t height;
 	int i;
-	for (i = 0; i < 50; i++){
-		rx_buf[i] = 0x00;
-		tx_buf[i] = 0x00;
+	for (i = 0; i < 2; i++){
+		height_string[i] = rx_buffer[i+4];
 	}
-}
-uint8_t read_character(uint8_t *pdata, uint8_t cursor){
-	rx_USART(&pdata[cursor]);
-	cursor++; // increment cursor
-	return cursor;
-}
-uint8_t delete_character(uint8_t rx_buf[], uint8_t cursor){
-	/* delete DEL and previous character */
-	rx_buf[cursor-1] = 0x00;
-	rx_buf[cursor-2] = 0x00;
-	cursor = cursor - 2;
-	return cursor;
+	height = atoi(height_string); // convert string to HEX angle val
+	
+	// get value from the LUT
+	int j;
+	for (j = 0; j < LOOKUP_TABLE_SIZE; ++j) {
+		if (height_lut[j].height == height) {
+				return height_lut[j].adc;
+		}
+	}
+	return 0; // return 0 if not present
 }
 void initial_boost(){
-	write_dutycycle_PWM(0x258); // Start the ball at the bottom
+	write_dutycycle_PWM(0x04B0); // Start the ball at the bottom
 	delay(8000000);
-	write_dutycycle_PWM(0x450); // Give it a little bit of lift
+	write_dutycycle_PWM(0x0700); // Give it a little bit of lift
 	delay(8000000);
-}
-void send_message(uint8_t *pdata, uint8_t size){
-	uint8_t buffer_index = 0;
-	while(buffer_index < size){
-		buffer_index++;// increment counter
-		tx_USART(pdata);//transmit data at pdata
-		pdata++;// increment pointer
-	}
 }
 void update_servo_angle(float control_signal) {
 	
@@ -116,7 +111,6 @@ void update_servo_angle(float control_signal) {
 		*/
 		write_dutycycle_PWM(angle); // Write the PWM
 }
-
 float calculate_PID(float error, float prev_error){
 	
 	float proportional_term = Kp * error; 	 // calculate proportional term

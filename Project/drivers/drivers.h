@@ -1,16 +1,24 @@
 /**
 		Filename: drivers.h
-		Description: This file defines/declares all drivers for lab1
+		Description: This file defines/declares all drivers for for ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
-		Date: 2023-01-29
+		Date: 2023-04-17
 		Class: ense481
-		Project: lab1
+		Project: Ball Height Controller
 */
 
 #ifndef DRIVERS_H
 #define DRIVERS_H
+
 #include <stm32f10x.h>
 #include <stdint.h>
+
+// Serial Communication global declarations
+#define BUFFER_SIZE 64
+extern uint8_t rx_buffer[BUFFER_SIZE];
+extern uint8_t tx_buffer[BUFFER_SIZE];
+extern uint8_t cursor;
+extern volatile _Bool cmd_received_flag;
 
 /** Configure the clock */
 void open_clock(void);
@@ -24,13 +32,11 @@ void start_clock(void);
 /** Stops the clock but keeps its configuration */
 void stop_clock(void);
 
-
 /** Configure GPIOA */
 void open_portA(void);
 
 /** Reset GPIOA */
 void close_portA(void);
-
 
 /** Configure GPIOA (PA5) for LED as 50 Mhz output*/
 void open_LED(void);
@@ -43,7 +49,6 @@ void start_LED(void);
 
 /** Turn off the LED */
 void stop_LED(void);
-
 
 /** Configure USART2 on APB2ENR */
 void open_USART(void);
@@ -72,6 +77,14 @@ void rx_USART(uint8_t *pData);
 			1: USART2 rx data is ready  (RXNE=1)
 	*/
 _Bool rx_ready_USART(void);
+
+/** USART interrupt handler
+
+		- stores characters in rx_buffer and send back the character
+		- if character received is /r, set flag to handle CLI command
+		- handles delete operator too
+	*/
+void USART2_IRQHandler(void);
 
 /** Setup ADC1 on Port A P0 */
 void open_ADC(void);

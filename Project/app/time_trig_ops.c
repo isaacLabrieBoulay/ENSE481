@@ -1,24 +1,21 @@
 /**
 		Filename: time_trig_ops.c
-		Description: This file defines all all trig timing functions
+		Description: This file defines all all trig timing functions for ENSE 481 Final Project
 		Author: Isaac Labrie-Boulay (200391860)
-		Date: 2023-02-17
+		Date: 2023-04-17
 		Class: ense481
-		Project: lab2
+		Project: Ball Height Controller
 */
-#include <stdint.h>
-#include <math.h>
-#ifndef  M_PI
-#define  M_PI  3.14159265358 // define for pi
-#endif
+
 #include "time_opps.h"
 #include "time_trig_ops.h"
 #include "timer.h"
-#include "app.h"
 
+#define  M_PI  3.14159265358 // define for pi
 #define cos_30 sqrt(3)/2
 #define sin_30 1/2
 #define pi_over_six M_PI/6 // pi/6
+
 uint16_t standard_cos(float angle){
 	volatile uint16_t time_start = TIM2_start();
 	volatile float cosine = cos(angle);
